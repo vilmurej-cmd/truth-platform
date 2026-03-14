@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { BookOpen, Search, MessageCircle, FileText } from 'lucide-react';
 import PublicQuestionCard from '@/components/PublicQuestionCard';
 import ContradictionDetector from '@/components/ContradictionDetector';
@@ -24,6 +23,69 @@ interface AnswerResult {
   };
   relatedQuestions: string[];
 }
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function normalizeApiResponse(data: any, originalQuestion: string): AnswerResult | null {
+  try {
+    const answerObj = data?.answer || data;
+    const question = data?.question || originalQuestion;
+
+    // Answer text: could be string or { summary }
+    let answer: string;
+    if (typeof answerObj === 'string') {
+      answer = answerObj;
+    } else {
+      answer = answerObj?.summary || answerObj?.answer || data?.summary || '';
+      // Append details if available
+      const details = data?.details;
+      if (details?.explanation) {
+        answer += '\n\n' + details.explanation;
+      }
+      if (details?.nuance) {
+        answer += '\n\n' + details.nuance;
+      }
+    }
+
+    const confidenceLevel = (typeof answerObj === 'object' ? answerObj?.confidenceLevel : null) || data?.confidenceLevel || 'moderate';
+
+    // Sources: API returns [{ title, type, reliability, key_point }], page needs [{ title, url? }]
+    const rawSources = data?.sources || answerObj?.sources || [];
+    const sources = Array.isArray(rawSources)
+      ? rawSources.map((s: any) => ({
+          title: typeof s === 'string' ? s : s?.title || s?.name || JSON.stringify(s),
+          url: s?.url,
+        }))
+      : [];
+
+    // Contradictions: API returns [{ claim_a, source_a, claim_b, source_b, analysis }]
+    const rawContradictions = data?.contradictions || [];
+    let contradiction: AnswerResult['contradiction'] = undefined;
+    if (Array.isArray(rawContradictions) && rawContradictions.length > 0) {
+      const first = rawContradictions[0];
+      contradiction = {
+        topic: question,
+        sourceA: { name: first?.source_a || 'Source A', claim: first?.claim_a || '' },
+        sourceB: { name: first?.source_b || 'Source B', claim: first?.claim_b || '' },
+        contradictions: rawContradictions.map((c: any) => ({
+          claimA: c?.claim_a || '',
+          claimB: c?.claim_b || '',
+        })),
+        resolution: first?.analysis || first?.resolution,
+      };
+    }
+
+    // Related questions: API returns [{ question }] or string[]
+    const rawRelated = data?.relatedQuestions || [];
+    const relatedQuestions = Array.isArray(rawRelated)
+      ? rawRelated.map((q: any) => (typeof q === 'string' ? q : q?.question || JSON.stringify(q)))
+      : [];
+
+    return { question, answer, sources, confidenceLevel, contradiction, relatedQuestions };
+  } catch {
+    return null;
+  }
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export default function PublicKnowledgePage() {
   const [query, setQuery] = useState('');
@@ -51,7 +113,12 @@ export default function PublicKnowledgePage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setAnswer(data);
+        const normalized = normalizeApiResponse(data, query.trim());
+        if (normalized) {
+          setAnswer(normalized);
+        } else {
+          fallbackAnswer(query.trim());
+        }
       } else {
         fallbackAnswer(query.trim());
       }
@@ -71,17 +138,16 @@ export default function PublicKnowledgePage() {
       setAnswer({
         question: match.question,
         answer: match.answer,
-        sources: match.sources.map((s) => ({ title: s })),
+        sources: (match.sources || []).map((s) => ({ title: s })),
         confidenceLevel: match.confidenceLevel,
         relatedQuestions: demoPublic.filter((p) => p.question !== match.question).map((p) => p.question),
       });
     } else {
-      // Show a general answer from the first demo entry
       const first = demoPublic[0];
       setAnswer({
         question: q,
-        answer: `While we don't have a specific entry for "${q}" in our verified database, here's a related topic that may help. ${first.answer.substring(0, 200)}...`,
-        sources: first.sources.map((s) => ({ title: s })),
+        answer: `While we don't have a specific entry for "${q}" in our verified database, here's a related topic that may help. ${(first?.answer || '').substring(0, 200)}...`,
+        sources: (first?.sources || []).map((s) => ({ title: s })),
         confidenceLevel: 'low',
         relatedQuestions: demoPublic.map((p) => p.question),
       });
@@ -95,7 +161,7 @@ export default function PublicKnowledgePage() {
       setAnswer({
         question: match.question,
         answer: match.answer,
-        sources: match.sources.map((s) => ({ title: s })),
+        sources: (match.sources || []).map((s) => ({ title: s })),
         confidenceLevel: match.confidenceLevel,
         relatedQuestions: demoPublic.filter((p) => p.question !== match.question).map((p) => p.question),
       });
@@ -110,33 +176,18 @@ export default function PublicKnowledgePage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(99,102,241,0.06)_0%,_transparent_60%)]" />
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-3 mb-4"
-          >
+          <div className="flex items-center justify-center gap-3 mb-4">
             <BookOpen className="w-8 h-8 text-[#6366F1]" />
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary">
               Public Knowledge
             </h1>
-          </motion.div>
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-text-secondary text-lg max-w-2xl mx-auto mb-10"
-          >
+          </div>
+          <p className="text-text-secondary text-lg max-w-2xl mx-auto mb-10">
             Ask anything. Get verified answers. See contradictions.
-          </motion.p>
+          </p>
 
           {/* Large search input */}
-          <motion.form
-            onSubmit={handleSubmit}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="max-w-2xl mx-auto"
-          >
+          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
             <div
               className="relative flex items-center rounded-xl border bg-surface/80 backdrop-blur-sm transition-all"
               style={{
@@ -163,7 +214,7 @@ export default function PublicKnowledgePage() {
                 Ask
               </button>
             </div>
-          </motion.form>
+          </form>
         </div>
       </section>
 
@@ -177,22 +228,18 @@ export default function PublicKnowledgePage() {
         {loading ? (
           <LoadingPulse message="Verifying sources and checking for contradictions" />
         ) : answer ? (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
+          <div className="space-y-6">
             {/* Answer */}
             <div className="bg-surface/60 border border-border rounded-xl p-6">
               <div className="flex items-start justify-between gap-3 mb-4">
                 <h2 className="text-lg font-bold text-text-primary">{answer.question}</h2>
                 <ConfidenceBadge level={answer.confidenceLevel} />
               </div>
-              <p className="text-text-secondary leading-relaxed">{answer.answer}</p>
+              <p className="text-text-secondary leading-relaxed whitespace-pre-line">{answer.answer}</p>
             </div>
 
             {/* Sources */}
-            {answer.sources.length > 0 && (
+            {answer.sources?.length > 0 && (
               <div className="bg-surface/60 border border-border rounded-xl p-6">
                 <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Verified Sources</h3>
                 <ul className="space-y-2">
@@ -224,7 +271,7 @@ export default function PublicKnowledgePage() {
             )}
 
             {/* Related Questions */}
-            {answer.relatedQuestions.length > 0 && (
+            {answer.relatedQuestions?.length > 0 && (
               <div className="bg-surface/60 border border-border rounded-xl p-6">
                 <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Related Questions</h3>
                 <div className="flex flex-wrap gap-2">
@@ -247,7 +294,7 @@ export default function PublicKnowledgePage() {
             >
               &larr; Back to common questions
             </button>
-          </motion.div>
+          </div>
         ) : (
           <div>
             <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
@@ -256,20 +303,15 @@ export default function PublicKnowledgePage() {
             </h2>
             <div className="space-y-3">
               {demoPublic.map((entry, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                >
+                <div key={i}>
                   <PublicQuestionCard
                     question={entry.question}
                     answer={entry.answer}
-                    sources={entry.sources.map((s) => ({ title: s }))}
+                    sources={(entry.sources || []).map((s) => ({ title: s }))}
                     lastUpdated={entry.lastUpdated}
                     confidenceLevel={entry.confidenceLevel}
                   />
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>

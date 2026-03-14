@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Landmark, MapPin, Search } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
 import ArchaeologyCard from '@/components/ArchaeologyCard';
@@ -35,6 +34,62 @@ interface AnalysisResult {
   confidenceLevel: 'verified' | 'high' | 'moderate' | 'low' | 'unverified';
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function normalizeApiResponse(data: any): AnalysisResult | null {
+  try {
+    const analysis = data?.analysis || data;
+    const title = analysis?.title || data?.title || 'Archaeological Analysis';
+    const location = analysis?.location || data?.location || 'Unknown';
+    const period = analysis?.period || data?.period || 'Unknown';
+    const summary = analysis?.summary || data?.summary || '';
+    const significance = analysis?.significance || data?.significance || '';
+    const confidenceLevel = analysis?.confidenceLevel || data?.confidenceLevel || 'moderate';
+
+    // Findings: API returns [{ item, description, dating, significance }], page needs string[]
+    const rawFindings = data?.findings || analysis?.findings || [];
+    const findings = Array.isArray(rawFindings)
+      ? rawFindings.map((f: any) => {
+          if (typeof f === 'string') return f;
+          const item = f?.item || f?.name || '';
+          const desc = f?.description || '';
+          return item && desc ? `${item}: ${desc}` : item || desc || JSON.stringify(f);
+        })
+      : [];
+
+    // Timeline: API returns [{ date, event }], page needs [{ date, title, description, type, confidenceLevel }]
+    const rawTimeline = data?.timeline || analysis?.timeline || [];
+    const timeline = Array.isArray(rawTimeline)
+      ? rawTimeline.map((t: any) => ({
+          date: t?.date || 'Unknown',
+          title: t?.title || t?.event?.substring(0, 50) || 'Event',
+          description: t?.description || t?.event || '',
+          type: t?.type || 'discovery',
+          confidenceLevel: (t?.confidenceLevel || confidenceLevel) as 'verified' | 'high' | 'moderate' | 'low' | 'unverified',
+        }))
+      : [];
+
+    // Connections from API or build from related theories
+    const rawConnections = data?.connections || analysis?.connections || [];
+    const nodes: AnalysisResult['connections']['nodes'] = [
+      { id: 'site', label: title.substring(0, 18), type: 'location', x: 300, y: 200 },
+    ];
+    const links: AnalysisResult['connections']['links'] = [];
+
+    if (Array.isArray(rawConnections)) {
+      rawConnections.forEach((c: any, i: number) => {
+        const label = (typeof c === 'string' ? c : c?.civilization || c?.label || `Connection ${i + 1}`).substring(0, 18);
+        nodes.push({ id: `related-${i}`, label, type: 'location', x: 100 + i * 250, y: 80 + (i % 2) * 240 });
+        links.push({ from: 'site', to: `related-${i}`, strength: 0.5 + Math.random() * 0.3 });
+      });
+    }
+
+    return { title, location, period, summary, significance, findings, timeline, connections: { nodes, links }, confidenceLevel };
+  } catch {
+    return null;
+  }
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 export default function BuriedPage() {
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
@@ -56,7 +111,12 @@ export default function BuriedPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setAnalysis(data);
+        const normalized = normalizeApiResponse(data);
+        if (normalized) {
+          setAnalysis(normalized);
+        } else {
+          fallbackAnalysis(query);
+        }
       } else {
         fallbackAnalysis(query);
       }
@@ -83,11 +143,11 @@ export default function BuriedPage() {
       period: entry.period,
       summary: entry.summary,
       significance: entry.significance,
-      findings: entry.findings,
+      findings: entry.findings || [],
       confidenceLevel: entry.confidenceLevel,
       timeline: [
-        { date: entry.period.split(' — ')[0] || entry.period, title: 'Origin Period', description: entry.significance, type: 'milestone', confidenceLevel: 'verified' },
-        ...entry.findings.slice(0, 3).map((f, i) => ({
+        { date: (entry.period || '').split(' — ')[0] || entry.period, title: 'Origin Period', description: entry.significance, type: 'milestone', confidenceLevel: 'verified' },
+        ...(entry.findings || []).slice(0, 3).map((f, i) => ({
           date: `Finding ${i + 1}`,
           title: f.substring(0, 50) + (f.length > 50 ? '...' : ''),
           description: f,
@@ -123,35 +183,20 @@ export default function BuriedPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(245,158,11,0.06)_0%,_transparent_60%)]" />
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-3 mb-4"
-          >
+          <div className="flex items-center justify-center gap-3 mb-4">
             <Landmark className="w-8 h-8 text-warning-amber" />
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary">
               Buried
             </h1>
-          </motion.div>
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-text-secondary text-lg max-w-2xl mx-auto mb-10"
-          >
+          </div>
+          <p className="text-text-secondary text-lg max-w-2xl mx-auto mb-10">
             What lies beneath tells us who we are. Archaeology meets AI.
-          </motion.p>
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <SearchBar
-              onSearch={handleSearch}
-              placeholder="Search for archaeological sites, artifacts, or civilizations..."
-            />
-          </motion.div>
+          <SearchBar
+            onSearch={handleSearch}
+            placeholder="Search for archaeological sites, artifacts, or civilizations..."
+          />
         </div>
       </section>
 
@@ -165,11 +210,7 @@ export default function BuriedPage() {
         {loading ? (
           <LoadingPulse message="Scanning archaeological databases and excavation reports" />
         ) : analysis ? (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-8"
-          >
+          <div className="space-y-8">
             {/* Analysis header */}
             <div className="bg-surface/60 border border-border rounded-xl p-6">
               <div className="flex items-start justify-between gap-3 mb-3">
@@ -186,27 +227,31 @@ export default function BuriedPage() {
                 <ConfidenceBadge level={analysis.confidenceLevel} />
               </div>
               <p className="text-text-secondary leading-relaxed mb-4">{analysis.summary}</p>
-              <div className="bg-warning-amber/5 border border-warning-amber/20 rounded-lg p-4">
-                <h4 className="text-xs font-semibold text-warning-amber uppercase tracking-wider mb-1">Significance</h4>
-                <p className="text-sm text-text-secondary">{analysis.significance}</p>
-              </div>
+              {analysis.significance && (
+                <div className="bg-warning-amber/5 border border-warning-amber/20 rounded-lg p-4">
+                  <h4 className="text-xs font-semibold text-warning-amber uppercase tracking-wider mb-1">Significance</h4>
+                  <p className="text-sm text-text-secondary">{analysis.significance}</p>
+                </div>
+              )}
             </div>
 
             {/* Findings */}
-            <div className="bg-surface/60 border border-border rounded-xl p-6">
-              <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-3">Key Findings</h3>
-              <ul className="space-y-2">
-                {analysis.findings.map((f, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
-                    <span className="text-warning-amber mt-1">&bull;</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {analysis.findings.length > 0 && (
+              <div className="bg-surface/60 border border-border rounded-xl p-6">
+                <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-3">Key Findings</h3>
+                <ul className="space-y-2">
+                  {analysis.findings.map((f, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
+                      <span className="text-warning-amber mt-1">&bull;</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Timeline */}
-            {analysis.timeline.length > 0 && (
+            {analysis.timeline?.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold text-text-primary mb-4">Discovery Timeline</h3>
                 <TimelineView events={analysis.timeline} />
@@ -214,7 +259,7 @@ export default function BuriedPage() {
             )}
 
             {/* Connection Map */}
-            {analysis.connections.nodes.length > 1 && (
+            {analysis.connections?.nodes?.length > 1 && (
               <div>
                 <h3 className="text-lg font-semibold text-text-primary mb-4">Connected Civilizations &amp; Sites</h3>
                 <ConnectionMap
@@ -230,7 +275,7 @@ export default function BuriedPage() {
             >
               &larr; Back to all sites
             </button>
-          </motion.div>
+          </div>
         ) : (
           <div>
             <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
@@ -239,23 +284,18 @@ export default function BuriedPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {demoBuried.map((entry, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                >
+                <div key={i}>
                   <ArchaeologyCard
                     title={entry.title}
                     location={entry.location}
                     period={entry.period}
                     significance={significanceScore(entry)}
                     summary={entry.summary}
-                    findingsCount={entry.findings.length}
+                    findingsCount={(entry.findings || []).length}
                     confidenceLevel={entry.confidenceLevel}
                     onClick={() => selectEntry(entry)}
                   />
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
