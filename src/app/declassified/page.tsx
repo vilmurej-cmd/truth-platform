@@ -47,7 +47,7 @@ export default function DeclassifiedPage() {
       const res = await fetch('/api/declassified/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, agency: category }),
+        body: JSON.stringify({ topic: query, agency: category }),
       });
       if (res.ok) {
         const data = await res.json();

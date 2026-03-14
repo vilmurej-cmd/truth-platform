@@ -59,7 +59,8 @@ export default function DiscoverPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setResults(data.results || data);
+        const items = data.discoveries || data.results || (Array.isArray(data) ? data : []);
+        setResults(items.length > 0 ? items : demoDiscover);
       } else {
         fallbackSearch(query);
       }

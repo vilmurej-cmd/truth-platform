@@ -89,7 +89,7 @@ export const LENSES: Lens[] = [
   },
   {
     name: "Public",
-    slug: "public",
+    slug: "public-knowledge",
     description: "Public knowledge base — verified answers to common questions",
     icon: "BookOpen",
     color: "#6366F1",

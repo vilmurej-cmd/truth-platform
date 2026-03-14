@@ -69,7 +69,7 @@ export default function SciencePage() {
       const res = await fetch('/api/science/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, field: category }),
+        body: JSON.stringify({ topic: query, field: category }),
       });
       if (res.ok) {
         const data = await res.json();

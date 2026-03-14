@@ -28,7 +28,8 @@ export default function HomePage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setResults(data.results || data);
+        const items = data.discoveries || data.results || (Array.isArray(data) ? data : []);
+        setResults(items.length > 0 ? items : demoDiscover);
       } else {
         // Fallback to demo data filtered by query
         const filtered = demoDiscover.filter(

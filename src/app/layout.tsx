@@ -100,7 +100,7 @@ function Navigation() {
               Science
             </a>
             <a
-              href="/public"
+              href="/public-knowledge"
               className="text-sm text-text-secondary hover:text-text-primary transition-colors"
             >
               Public

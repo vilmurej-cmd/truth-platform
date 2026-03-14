@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, Search, Snowflake, Waves, Landmark, FileKey, FlaskConical, Users, type LucideIcon } from 'lucide-react';
+import { ArrowRight, Search, Fingerprint, Waves, Landmark, ShieldAlert, FlaskConical, BookOpen, Snowflake, FileKey, Users, type LucideIcon } from 'lucide-react';
 
 interface LensCardProps {
   name: string;
@@ -14,11 +14,14 @@ interface LensCardProps {
 
 const iconMap: Record<string, LucideIcon> = {
   Search,
-  Snowflake,
+  Fingerprint,
   Waves,
   Landmark,
-  FileKey,
+  ShieldAlert,
   FlaskConical,
+  BookOpen,
+  Snowflake,
+  FileKey,
   Users,
 };
 
@@ -26,7 +29,7 @@ export default function LensCard({ name, description, icon, color, slug }: LensC
   const Icon = iconMap[icon] || Search;
 
   return (
-    <Link href={slug}>
+    <Link href={`/${slug}`}>
       <motion.div
         whileHover={{ scale: 1.02 }}
         className="group bg-surface/60 border border-border rounded-xl p-6 transition-all duration-300 hover:border-opacity-60 h-full"

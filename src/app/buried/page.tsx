@@ -52,7 +52,7 @@ export default function BuriedPage() {
       const res = await fetch('/api/buried/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ site: query }),
       });
       if (res.ok) {
         const data = await res.json();
