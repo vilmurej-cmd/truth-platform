@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+@import "tailwindcss";
+
+:root {
+  --deep-navy: #0A1628;
+  --midnight: #121A2E;
+  --truth-blue: #2563EB;
+  --discovery-gold: #F59E0B;
+  --evidence-green: #10B981;
+  --warning-amber: #D97706;
+  --critical-red: #EF4444;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --surface: #1E293B;
+  --border: #334155;
+}
+
+@theme {
+  --color-deep-navy: #0A1628;
+  --color-midnight: #121A2E;
+  --color-truth-blue: #2563EB;
+  --color-discovery-gold: #F59E0B;
+  --color-evidence-green: #10B981;
+  --color-warning-amber: #D97706;
+  --color-critical-red: #EF4444;
+  --color-text-primary: #F1F5F9;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+  --color-surface: #1E293B;
+  --color-border: #334155;
+
+  --font-serif: "Newsreader", serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+/* Confidence badge utilities */
+.confidence-verified {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.confidence-high {
+  background-color: rgba(37, 99, 235, 0.15);
+  color: #2563EB;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+.confidence-moderate {
+  background-color: rgba(217, 119, 6, 0.15);
+  color: #D97706;
+  border: 1px solid rgba(217, 119, 6, 0.3);
+}
+
+.confidence-low {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.confidence-unverified {
+  background-color: rgba(100, 116, 139, 0.15);
+  color: #64748B;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+/* Common badge shape */
+.confidence-verified,
+.confidence-high,
+.confidence-moderate,
+.confidence-low,
+.confidence-unverified {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--deep-navy);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(37, 99, 235, 0.3);
+  color: var(--text-primary);
+}
