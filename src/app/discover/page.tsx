@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
@@ -37,7 +38,16 @@ const demoInsights = [
   },
 ];
 
-export default function DiscoverPage() {
+export default function DiscoverPageWrapper() {
+  return (
+    <Suspense>
+      <DiscoverPage />
+    </Suspense>
+  );
+}
+
+function DiscoverPage() {
+  const searchParams = useSearchParams();
   const [results, setResults] = useState<Discovery[]>(demoDiscover);
   const [loading, setLoading] = useState(false);
   const [confidenceLevels, setConfidenceLevels] = useState<ConfidenceLevel[]>([
@@ -70,6 +80,15 @@ export default function DiscoverPage() {
       setLoading(false);
     }
   };
+
+  // Auto-search if ?q= param is present (from homepage redirect)
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q) {
+      handleSearch(q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fallbackSearch = (query: string) => {
     const q = query.toLowerCase();
