@@ -1,30 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const SYSTEM_PROMPT = `You are TRUTH, the world's first universal discovery engine. Analyze the query and return discoveries with cross-referenced sources. Return JSON with: discoveries[] (title, summary, sources[], confidenceLevel, connections[], category), insights[] (connection between topics), methodology. Return ONLY valid JSON, no markdown.`;
+const SYSTEM_PROMPT = `You are TRUTH, the world's first universal discovery engine. Analyze the query and return discoveries with cross-referenced sources.
+
+Return JSON with:
+- discoveries[] — each with: title, summary (detailed, 2-3 paragraphs), sources[] (each with name and type like "academic", "government", "witness", "news", "database"), confidenceLevel ("verified"|"high"|"moderate"|"low"|"unverified"), connections[] (string descriptions of related topics/findings), category
+- insights[] — each with: topicA (first finding name), topicB (second finding name), relationship (how they connect), connectionType ("causal"|"temporal"|"geographic"|"thematic"), strength (0-100)
+- methodology (string explaining the analysis approach)
+
+Return ONLY valid JSON, no markdown.`;
 
 const DEMO_RESPONSE = {
   discoveries: [
     {
       title: 'Pattern Recognition in Historical Data',
-      summary: 'Cross-referencing multiple databases reveals recurring patterns that connect seemingly unrelated events across different time periods and geographic regions.',
-      sources: ['National Archives', 'Academic Journals', 'Public Records Database'],
+      summary: 'Cross-referencing multiple databases reveals recurring patterns that connect seemingly unrelated events across different time periods and geographic regions. Analysis of declassified archives alongside academic publications shows statistically significant correlations in timing and geographic clustering of events previously considered independent. These patterns suggest coordinated or systemic forces at work beneath surface-level historical narratives.',
+      sources: [
+        { name: 'National Archives — Declassified Records', type: 'government' },
+        { name: 'Journal of Historical Analysis, Vol. 42', type: 'academic' },
+        { name: 'Public Records Aggregation Database', type: 'database' }
+      ],
       confidenceLevel: 'high',
-      connections: ['Historical Pattern Analysis', 'Data Cross-Referencing'],
+      connections: ['Historical Pattern Analysis', 'Data Cross-Referencing', 'Temporal clustering of geopolitical events'],
       category: 'general'
     },
     {
       title: 'Emerging Connections in Open-Source Intelligence',
-      summary: 'Open-source intelligence analysis reveals previously overlooked connections between public records, scientific publications, and declassified materials.',
-      sources: ['OSINT Databases', 'Published Research', 'Government Records'],
+      summary: 'Open-source intelligence analysis reveals previously overlooked connections between public records, scientific publications, and declassified materials. Natural language processing of 1.4 million public documents identifies recurring entity relationships that traditional keyword searches miss entirely. The methodology combines named-entity recognition with graph-based relationship mapping to surface hidden networks of influence and information flow.',
+      sources: [
+        { name: 'OSINT Framework Aggregated Databases', type: 'database' },
+        { name: 'Published Research Corpus (2020-2026)', type: 'academic' },
+        { name: 'Government Transparency Portal', type: 'government' }
+      ],
       confidenceLevel: 'moderate',
-      connections: ['Open Source Intelligence', 'Public Records Analysis'],
+      connections: ['Open Source Intelligence', 'Public Records Analysis', 'NLP-driven entity extraction'],
       category: 'general'
     }
   ],
   insights: [
-    'Multiple independent sources corroborate the same underlying pattern, increasing confidence in the discovery.',
-    'Cross-domain analysis reveals connections that single-discipline research typically misses.'
+    {
+      topicA: 'Historical Pattern Recognition',
+      topicB: 'Open-Source Intelligence',
+      relationship: 'Both analyses independently identify the same temporal clustering pattern in declassified documents, with OSINT methods confirming patterns first detected through traditional archival research.',
+      connectionType: 'thematic',
+      strength: 78
+    }
   ],
   methodology: 'Multi-source cross-referencing with confidence weighting based on source reliability and corroboration density.'
 };
