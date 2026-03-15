@@ -50,7 +50,7 @@ export default function CureAccelerator({
               <FlaskConical className="w-3 h-3" />
               {field}
             </span>
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig[status].className}`}>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${(statusConfig[status] || statusConfig.Research).className}`}>
               {status}
             </span>
           </div>

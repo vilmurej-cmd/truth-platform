@@ -36,7 +36,7 @@ const config: Record<MethodologyType, { icon: typeof Brain; color: string; bg: s
 };
 
 export default function MethodologyBadge({ type }: MethodologyBadgeProps) {
-  const { icon: Icon, color, bg, border } = config[type];
+  const { icon: Icon, color, bg, border } = config[type] || config['AI Analysis'];
 
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${color} ${bg} border ${border}`}>

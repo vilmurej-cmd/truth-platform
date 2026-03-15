@@ -37,7 +37,8 @@ const config: Record<ConfidenceLevel, { icon: typeof CheckCircle; label: string;
 };
 
 export default function ConfidenceBadge({ level }: ConfidenceBadgeProps) {
-  const { icon: Icon, label, className } = config[level];
+  const entry = config[level] || config.moderate;
+  const { icon: Icon, label, className } = entry;
 
   return (
     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium uppercase tracking-wider ${className}`}>

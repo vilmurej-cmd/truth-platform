@@ -34,7 +34,7 @@ export default function ColdCaseCard({
   confidenceLevel,
   onClick,
 }: ColdCaseCardProps) {
-  const statusCfg = statusConfig[status];
+  const statusCfg = statusConfig[status] || statusConfig.cold;
 
   return (
     <motion.div

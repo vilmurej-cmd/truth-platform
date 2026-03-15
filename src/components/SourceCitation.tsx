@@ -22,7 +22,7 @@ const typeConfig: Record<SourceType, { icon: typeof FileText; color: string; bor
 };
 
 export default function SourceCitation({ title, url, type, date, reliability }: SourceCitationProps) {
-  const { icon: Icon, color, borderColor } = typeConfig[type];
+  const { icon: Icon, color, borderColor } = typeConfig[type] || typeConfig.document;
   const clampedReliability = Math.max(1, Math.min(5, Math.round(reliability)));
 
   return (
