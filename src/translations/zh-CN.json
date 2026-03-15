@@ -1,0 +1,9 @@
+{
+  "nav": { "home": "首页", "discover": "发现", "coldCases": "悬案", "deepOcean": "深海", "buried": "考古", "declassified": "解密", "science": "科学", "public": "公共知识", "about": "关于", "methodology": "方法论" },
+  "hero": { "title": "全球知识，互联互通。", "subtitle": "问任何问题。发现一切。", "searchPlaceholder": "你想知道什么？" },
+  "confidence": { "verified": "已验证", "probable": "高度可能", "speculative": "推测性", "unknown": "未知", "high": "高置信度", "moderate": "中等置信度", "low": "低置信度" },
+  "results": { "findings": "发现", "connections": "发现的关联", "sources": "来源", "unanswered": "未解答的问题", "methodology": "分析方法" },
+  "common": { "loading": "分析中...", "search": "搜索", "close": "关闭", "back": "返回", "share": "分享", "save": "保存" },
+  "footer": { "mission": "真相并非隐藏，而是散落各处。TRUTH将碎片拼合。", "company": "Vilmure Ventures 旗下公司" },
+  "language": { "searchLanguages": "搜索语言...", "recentlyUsed": "最近使用", "popular": "热门语言", "allLanguages": "所有语言" }
+}

@@ -1,0 +1,9 @@
+{
+  "nav": { "home": "Home", "discover": "Discover", "coldCases": "Cold Cases", "deepOcean": "Deep Ocean", "buried": "Buried", "declassified": "Declassified", "science": "Science", "public": "Public Knowledge", "about": "About", "methodology": "Methodology" },
+  "hero": { "title": "The world's knowledge, connected.", "subtitle": "Ask anything. Discover everything.", "searchPlaceholder": "What do you want to know?" },
+  "confidence": { "verified": "Verified", "probable": "Probable", "speculative": "Speculative", "unknown": "Unknown", "high": "High Confidence", "moderate": "Moderate Confidence", "low": "Low Confidence" },
+  "results": { "findings": "Findings", "connections": "Connections Found", "sources": "Sources", "unanswered": "Unanswered Questions", "methodology": "How This Was Analyzed" },
+  "common": { "loading": "Analyzing...", "search": "Search", "close": "Close", "back": "Back", "share": "Share", "save": "Save" },
+  "footer": { "mission": "The truth is not hidden. It's scattered. TRUTH assembles the pieces.", "company": "A Vilmure Ventures Company" },
+  "language": { "searchLanguages": "Search languages...", "recentlyUsed": "Recently Used", "popular": "Popular Languages", "allLanguages": "All Languages" }
+}

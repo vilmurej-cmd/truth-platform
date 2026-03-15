@@ -1,0 +1,9 @@
+{
+  "nav": { "home": "Inicio", "discover": "Descubrir", "coldCases": "Casos Sin Resolver", "deepOcean": "Océano Profundo", "buried": "Enterrado", "declassified": "Desclasificado", "science": "Ciencia", "public": "Conocimiento Público", "about": "Acerca de", "methodology": "Metodología" },
+  "hero": { "title": "El conocimiento del mundo, conectado.", "subtitle": "Pregunta lo que sea. Descubre todo.", "searchPlaceholder": "¿Qué quieres saber?" },
+  "confidence": { "verified": "Verificado", "probable": "Probable", "speculative": "Especulativo", "unknown": "Desconocido", "high": "Alta Confianza", "moderate": "Confianza Moderada", "low": "Baja Confianza" },
+  "results": { "findings": "Hallazgos", "connections": "Conexiones Encontradas", "sources": "Fuentes", "unanswered": "Preguntas Sin Respuesta", "methodology": "Cómo Se Analizó" },
+  "common": { "loading": "Analizando...", "search": "Buscar", "close": "Cerrar", "back": "Volver", "share": "Compartir", "save": "Guardar" },
+  "footer": { "mission": "La verdad no está oculta. Está dispersa. TRUTH reúne las piezas.", "company": "Una empresa de Vilmure Ventures" },
+  "language": { "searchLanguages": "Buscar idiomas...", "recentlyUsed": "Usados Recientemente", "popular": "Idiomas Populares", "allLanguages": "Todos los Idiomas" }
+}
