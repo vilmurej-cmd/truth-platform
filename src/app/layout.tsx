@@ -29,6 +29,20 @@ export const metadata: Metadata = {
   title: "TRUTH — Universal Discovery Engine",
   description:
     "The world's first universal discovery engine. Seven lenses. One truth. Connect the disconnected.",
+  openGraph: {
+    title: "TRUTH — Universal Discovery Engine",
+    description:
+      "Cold cases, deep ocean, lost civilizations, declassified files, medical frontiers — seven lenses, one truth.",
+    type: "website",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "TRUTH — seven lenses, one truth" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TRUTH — Universal Discovery Engine",
+    description:
+      "Cold cases, deep ocean, lost civilizations, declassified files, medical frontiers — seven lenses, one truth.",
+    images: ["/og.png"],
+  },
 };
 
 export default function RootLayout({

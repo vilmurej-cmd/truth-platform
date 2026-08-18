@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { guardRequest, capText } from '@/lib/api-guard';
 
 const SYSTEM_PROMPT = `You are TRUTH's Cure Accelerator. Analyze scientific research, medical breakthroughs, and treatment developments. Track progress from lab to patient. Return JSON with: analysis (title, field, status, summary, confidenceLevel), breakthroughs[] (discovery, year, significance, status), barriers[] (barrier, type, solution), timeline (estimatedMilestones[] with year and milestone), currentTrials[] (name, phase, institution), connections[] (relatedResearch, connection). Return ONLY valid JSON, no markdown.`;
 
@@ -8,7 +9,7 @@ const DEMO_RESPONSE = {
     title: 'Scientific Research Progress Analysis',
     field: 'Biomedical Research',
     status: 'Active research with promising early results',
-    summary: 'Current research in this field shows significant momentum with multiple parallel approaches advancing through clinical trials. Key breakthroughs in molecular understanding and targeted delivery mechanisms have accelerated the timeline from laboratory discovery to clinical application.',
+    summary: 'Example analysis (demo mode — live AI engine not connected). Current research in this field shows significant momentum with multiple parallel approaches advancing through clinical trials. Key breakthroughs in molecular understanding and targeted delivery mechanisms have accelerated the timeline from laboratory discovery to clinical application.',
     confidenceLevel: 'high'
   },
   breakthroughs: [
@@ -81,9 +82,16 @@ const DEMO_RESPONSE = {
 };
 
 export async function POST(req: NextRequest) {
+  // AI analysis is expensive (GPT-4o) — tight limits: 5/min, 20/hour per IP
+  const blocked =
+    guardRequest(req, { limit: 5, windowMs: 60_000 }) ??
+    guardRequest(req, { limit: 20, windowMs: 3_600_000, dailyCap: 1000 });
+  if (blocked) return blocked;
+
   try {
     const body = await req.json();
-    const { topic, field } = body;
+    const topic = capText(body.topic, 500);
+    const field = capText(body.field, 100);
 
     if (!topic) {
       return NextResponse.json({ error: 'topic is required' }, { status: 400 });

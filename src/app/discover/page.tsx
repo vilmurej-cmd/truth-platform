@@ -68,94 +68,97 @@ const TYPEWRITER_PHRASES = [
 ];
 
 // ─── Demo data ───────────────────────────────────────────────────────
+// HONESTY RULE: preview entries are REAL, verifiable stories only — never
+// invented "discoveries" or fabricated citations. These three are true
+// cross-domain cases: TRUTH's thesis, demonstrated with facts.
 const demoDiscoveries: DiscoveryResult[] = [
   {
-    title: 'Interconnected Underground Tunnel Networks Beneath Major Cities',
+    title: 'Genetic Genealogy Cracks the Golden State Killer Case',
     summary:
-      'Cross-referencing geological surveys, urban planning archives, and declassified military documents reveals a pattern of interconnected tunnel systems beneath at least 14 major cities worldwide.',
+      'In April 2018, investigators identified the Golden State Killer by uploading crime-scene DNA to a public genealogy database and building family trees from partial matches — consumer ancestry science solving a 1970s–80s cold case. Hundreds of unsolved cases have since been reopened with the same method.',
     sources: [
-      { name: 'USGS Geological Survey Database', type: 'government' },
-      { name: 'National Archives — Urban Infrastructure Records', type: 'government' },
-      { name: 'University of Edinburgh Subterranean Research Group', type: 'academic' },
+      { name: 'Sacramento County District Attorney (2018)', type: 'government' },
+      { name: 'GEDmatch public genealogy database', type: 'database' },
+      { name: 'AP / NYT / Washington Post reporting, April 2018', type: 'news' },
     ],
-    confidenceLevel: 'high',
+    confidenceLevel: 'verified',
     connections: [
-      'Ancient Roman infrastructure parallels',
-      'Cold War bunker network expansions',
-      'Missing persons reports near tunnel entrances',
+      'Dozens of cold cases reopened via genetic genealogy',
+      'Consumer DNA sequencing technology',
+      'Genetic privacy policy debates',
     ],
-    truthScore: 78,
-    crossLens: ['Buried', 'Declassified', 'Cold Cases'],
+    truthScore: 96,
+    crossLens: ['Cold Cases', 'Science'],
   },
   {
-    title: 'Correlation Between Deep-Sea Magnetic Anomalies and Archaeological Sites',
+    title: 'The Antikythera Mechanism — a 2,000-Year-Old Analog Computer',
     summary:
-      'Machine learning analysis of ocean floor magnetometry data shows statistically significant overlap with known coastal archaeological sites, suggesting submerged settlements.',
+      'Recovered in 1901 from a Roman-era shipwreck by Greek sponge divers, this corroded bronze device was revealed by modern X-ray tomography to be a geared astronomical calculator predicting eclipses and planetary positions — engineering thought impossible for its era.',
     sources: [
-      { name: 'NOAA Ocean Exploration Dataset', type: 'database' },
-      { name: 'Journal of Archaeological Science, Vol. 148', type: 'academic' },
-      { name: 'Woods Hole Oceanographic Institution', type: 'academic' },
+      { name: 'National Archaeological Museum, Athens', type: 'academic' },
+      { name: 'Antikythera Mechanism Research Project (Nature, 2006)', type: 'academic' },
+      { name: 'University College London gearing studies', type: 'academic' },
     ],
-    confidenceLevel: 'moderate',
+    confidenceLevel: 'verified',
     connections: [
-      'Bimini Road formation analysis',
-      'Coastal Neolithic settlement patterns',
-      'Sea level reconstruction models',
+      'Recovered from a shipwreck at ~45m depth',
+      'Hellenistic-era precision engineering',
+      'Modern X-ray tomography imaging',
     ],
-    truthScore: 62,
+    truthScore: 94,
     crossLens: ['Deep Ocean', 'Buried', 'Science'],
   },
   {
-    title: 'Pattern Analysis of Declassified Documents Reveals Systematic Data Gaps',
+    title: 'Most of the Ocean Floor Is Still Unmapped in Detail',
     summary:
-      'NLP analysis of 2.3 million declassified government documents reveals consistent redaction patterns suggesting coordinated information suppression across multiple agencies between 1953-1974.',
+      'The Seabed 2030 project reports that only roughly a quarter of the ocean floor has been directly mapped in high resolution — the rest is known mainly from coarse satellite estimates. Every mapping season surfaces new seamounts, wrecks, and habitats.',
     sources: [
-      { name: 'CIA FOIA Reading Room', type: 'government' },
-      { name: 'NSA Declassified Archives', type: 'government' },
-      { name: 'GWU National Security Archive', type: 'academic' },
+      { name: 'Seabed 2030 / GEBCO progress reports', type: 'academic' },
+      { name: 'NOAA Ocean Exploration', type: 'government' },
+      { name: 'Nippon Foundation–GEBCO partnership', type: 'database' },
     ],
-    confidenceLevel: 'moderate',
+    confidenceLevel: 'verified',
     connections: [
-      'Project MKUltra timeline gaps',
-      'Unresolved journalist disappearances 1960s',
-      'FOIA structural gaps',
+      'UNESCO estimates 3M+ shipwrecks still undiscovered',
+      'Submerged coastal settlement candidates',
+      'Open bathymetry datasets',
     ],
-    truthScore: 58,
-    crossLens: ['Declassified', 'Cold Cases'],
+    truthScore: 92,
+    crossLens: ['Deep Ocean', 'Buried'],
   },
 ];
 
 const demoInsights: InsightResult[] = [
   {
-    topicA: 'Underground Tunnels',
-    topicB: 'Declassified Documents',
+    topicA: 'Genetic Genealogy',
+    topicB: 'Cold Cases',
     relationship:
-      'Cross-referencing geological surveys with declassified Cold War documents reveals that 6 of 14 identified tunnel networks were expanded by military engineering corps between 1955-1968.',
-    connectionType: 'temporal',
-    strength: 87,
-  },
-  {
-    topicA: 'Magnetic Anomalies',
-    topicB: 'Underground Tunnels',
-    relationship:
-      'Both findings reference overlapping geological survey datasets. Magnetic field disturbances near tunnel networks mirror patterns found at submerged archaeological sites.',
-    connectionType: 'geographic',
-    strength: 72,
-  },
-  {
-    topicA: 'Document Redactions',
-    topicB: 'Journalist Disappearances',
-    relationship:
-      'Temporal mapping of systematic redaction patterns in declassified CIA/NSA documents shows 3 clusters overlapping with unsolved journalist disappearance cases from 1961-1973.',
+      'A consumer hobby (ancestry DNA testing) became the most powerful cold-case tool in a generation — the Golden State Killer identification in 2018 triggered a wave of solved decades-old cases.',
     connectionType: 'causal',
-    strength: 58,
+    strength: 94,
+  },
+  {
+    topicA: 'Shipwrecks',
+    topicB: 'Lost Technology',
+    relationship:
+      'The Antikythera wreck shows the deep ocean is an archaeological archive: a single shipwreck rewrote the known history of ancient engineering.',
+    connectionType: 'thematic',
+    strength: 88,
+  },
+  {
+    topicA: 'Ocean Mapping',
+    topicB: 'Future Discoveries',
+    relationship:
+      "With ~75% of the seafloor unmapped in detail, most of the planet's wrecks, vents, and submerged sites are literally still waiting to be found — discovery is a mapping problem.",
+    connectionType: 'temporal',
+    strength: 84,
   },
 ];
 
 // Node connections for the web: [sourceIndex, targetIndex]
 const nodeConnections: [number, number][] = [
-  [0, 2], // Tunnels <-> Declassified (Cold War link)
-  [1, 0], // Magnetic Anomalies <-> Tunnels (geological surveys)
+  [0, 2], // genetic genealogy <-> ocean mapping (technology unlocking discovery)
+  [1, 2], // Antikythera <-> unmapped ocean (the deep as an archive)
 ];
 
 // ─── Confidence config ───────────────────────────────────────────────

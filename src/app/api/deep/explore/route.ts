@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { guardRequest, capText } from '@/lib/api-guard';
 
 const SYSTEM_PROMPT = `You are TRUTH's Deep Ocean Explorer. Analyze ocean mysteries, underwater discoveries, and marine phenomena. Cross-reference scientific data with historical accounts. Return JSON with: exploration (title, location, depth, summary, confidenceLevel), discoveries[] (name, description, significance), theories[] (theory, evidence, likelihood), relatedSites[] (name, connection), oceanFacts[] (fact, source). Return ONLY valid JSON, no markdown.`;
 
@@ -8,7 +9,7 @@ const DEMO_RESPONSE = {
     title: 'Deep Ocean Anomaly Analysis',
     location: 'Mid-Atlantic Ridge, North Atlantic Ocean',
     depth: '3,800 meters',
-    summary: 'Analysis of deep ocean features reveals a complex interplay between geological activity, unique biological ecosystems, and historical maritime events. Hydrothermal vent systems in this region support chemosynthetic life forms and may hold clues to the origins of life on Earth.',
+    summary: 'Example analysis (demo mode — live AI engine not connected). Analysis of deep ocean features reveals a complex interplay between geological activity, unique biological ecosystems, and historical maritime events. Hydrothermal vent systems in this region support chemosynthetic life forms and may hold clues to the origins of life on Earth.',
     confidenceLevel: 'high'
   },
   discoveries: [
@@ -62,9 +63,17 @@ const DEMO_RESPONSE = {
 };
 
 export async function POST(req: NextRequest) {
+  // AI analysis is expensive (GPT-4o) — tight limits: 5/min, 20/hour per IP
+  const blocked =
+    guardRequest(req, { limit: 5, windowMs: 60_000 }) ??
+    guardRequest(req, { limit: 20, windowMs: 3_600_000, dailyCap: 1000 });
+  if (blocked) return blocked;
+
   try {
     const body = await req.json();
-    const { query, depth, location } = body;
+    const query = capText(body.query, 500);
+    const depth = capText(body.depth, 60);
+    const location = capText(body.location, 200);
 
     if (!query) {
       return NextResponse.json({ error: 'query is required' }, { status: 400 });

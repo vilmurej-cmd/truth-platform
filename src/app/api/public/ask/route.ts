@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { guardRequest, capText } from '@/lib/api-guard';
 
 const SYSTEM_PROMPT = `You are TRUTH's Public Knowledge Engine. Answer questions with verified, source-cited information. Identify contradictions between sources. Be transparent about uncertainty. Return JSON with: answer (summary, confidenceLevel, methodology), details (explanation, nuance, context), sources[] (title, type, reliability, key_point), contradictions[] (claim_a, source_a, claim_b, source_b, analysis), relatedQuestions[] (question). Return ONLY valid JSON, no markdown.`;
 
@@ -7,7 +8,7 @@ const DEMO_RESPONSE = {
   answer: {
     summary: 'Based on cross-referencing multiple verified sources, the evidence supports a well-documented understanding of this topic, though some areas remain subject to ongoing research and scholarly debate.',
     confidenceLevel: 'high',
-    methodology: 'Multi-source verification using peer-reviewed publications, official records, and established reference works. Sources weighted by reliability and recency.'
+    methodology: 'Example analysis (demo mode — live AI engine not connected). Multi-source verification using peer-reviewed publications, official records, and established reference works. Sources weighted by reliability and recency.'
   },
   details: {
     explanation: 'The current scientific and scholarly consensus is supported by extensive evidence accumulated over decades of research. Key findings have been independently replicated across multiple institutions and published in peer-reviewed journals.',
@@ -51,9 +52,15 @@ const DEMO_RESPONSE = {
 };
 
 export async function POST(req: NextRequest) {
+  // AI analysis is expensive (GPT-4o) — tight limits: 5/min, 20/hour per IP
+  const blocked =
+    guardRequest(req, { limit: 5, windowMs: 60_000 }) ??
+    guardRequest(req, { limit: 20, windowMs: 3_600_000, dailyCap: 1000 });
+  if (blocked) return blocked;
+
   try {
     const body = await req.json();
-    const { question } = body;
+    const question = capText(body.question, 600);
 
     if (!question) {
       return NextResponse.json({ error: 'question is required' }, { status: 400 });

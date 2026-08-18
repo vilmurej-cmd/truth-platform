@@ -11,57 +11,60 @@ export interface Discovery {
   timestamp: string;
 }
 
+// HONESTY RULE (platform-wide): demo/preview entries are REAL, verifiable
+// subjects only — never invented "discoveries" or fabricated citations.
+// These three are true cross-domain stories, TRUTH's thesis made real.
 export const demoDiscover: Discovery[] = [
   {
-    title: "Interconnected Underground Tunnel Networks Beneath Major Cities",
+    title: "Genetic Genealogy Cracks the Golden State Killer Case",
     summary:
-      "Cross-referencing geological surveys, urban planning archives, and declassified military documents reveals a pattern of interconnected tunnel systems beneath at least 14 major cities worldwide. Many predate official city records by centuries.",
+      "In April 2018, investigators identified the Golden State Killer by uploading crime-scene DNA to a public genealogy database and building family trees from partial matches — a technique borrowed from hobbyist ancestry research. A cold case from the 1970s–80s was solved by consumer science from a completely different domain, and the method has since reopened hundreds of unsolved cases.",
     sources: [
-      "USGS Geological Survey Database",
-      "National Archives — Urban Infrastructure Records",
-      "University of Edinburgh Subterranean Research Group",
+      "Sacramento County District Attorney (2018 announcement)",
+      "GEDmatch public genealogy database",
+      "Widely reported: AP, NYT, Washington Post, April 2018",
     ],
-    confidenceLevel: "high",
+    confidenceLevel: "verified",
     connections: [
-      "Buried: Ancient Roman infrastructure",
-      "Declassified: Cold War bunker networks",
-      "Cold Cases: Missing persons near tunnel entrances",
+      "Cold Cases: dozens of cases reopened via the same method",
+      "Science: consumer DNA sequencing",
+      "Public: genetic privacy debates",
     ],
-    timestamp: "2026-03-12T14:30:00Z",
+    timestamp: "2018-04-25T00:00:00Z",
   },
   {
-    title: "Correlation Between Deep-Sea Magnetic Anomalies and Archaeological Sites",
+    title: "The Antikythera Mechanism — a 2,000-Year-Old Analog Computer",
     summary:
-      "Machine learning analysis of ocean floor magnetometry data shows statistically significant overlap with known coastal archaeological sites, suggesting submerged settlements along ancient coastlines during lower sea levels.",
+      "Recovered in 1901 from a Roman-era shipwreck by sponge divers off the Greek island of Antikythera, this corroded bronze device was revealed by modern X-ray tomography (2006 onward) to be a geared astronomical calculator predicting eclipses and planetary positions — engineering thought impossible for its era. A deep-ocean find, an archaeological puzzle, and an instrument of science, all in one object.",
     sources: [
-      "NOAA Ocean Exploration Dataset",
-      "Journal of Archaeological Science, Vol. 148",
-      "Woods Hole Oceanographic Institution",
+      "National Archaeological Museum, Athens",
+      "Antikythera Mechanism Research Project (Nature, 2006)",
+      "University College London gearing studies",
     ],
-    confidenceLevel: "moderate",
+    confidenceLevel: "verified",
     connections: [
-      "Deep Ocean: Bimini Road formation",
-      "Buried: Coastal Neolithic settlements",
-      "Science: Sea level reconstruction models",
+      "Deep Ocean: recovered from a shipwreck at ~45m",
+      "Buried: Hellenistic-era technology",
+      "Science: X-ray tomography imaging",
     ],
-    timestamp: "2026-03-10T09:15:00Z",
+    timestamp: "1901-05-17T00:00:00Z",
   },
   {
-    title: "Pattern Analysis of Declassified Documents Reveals Systematic Data Gaps",
+    title: "Most of the Ocean Floor Is Still Unmapped in Detail",
     summary:
-      "Natural language processing of 2.3 million declassified government documents reveals consistent redaction patterns that, when mapped temporally and geographically, suggest coordinated information suppression across multiple agencies between 1953-1974.",
+      "The Seabed 2030 project (Nippon Foundation–GEBCO) reports that only roughly a quarter of the world's ocean floor has been directly mapped in high resolution — the rest is known mainly from coarse satellite-derived estimates. Every year the mapping effort surfaces new seamounts, wrecks, and habitats, which is why the deep ocean remains the planet's largest unexplored archive.",
     sources: [
-      "CIA FOIA Reading Room",
-      "NSA Declassified Archives",
-      "George Washington University National Security Archive",
+      "Seabed 2030 / GEBCO progress reports",
+      "NOAA Ocean Exploration",
+      "Nippon Foundation–GEBCO partnership",
     ],
-    confidenceLevel: "moderate",
+    confidenceLevel: "verified",
     connections: [
-      "Declassified: Project MKUltra timeline",
-      "Cold Cases: Unresolved journalist disappearances 1960s",
-      "Public: Freedom of Information Act gaps",
+      "Deep Ocean: an estimated 3M+ shipwrecks still undiscovered (UNESCO)",
+      "Buried: submerged coastal settlements",
+      "Public: open bathymetry data",
     ],
-    timestamp: "2026-03-08T18:45:00Z",
+    timestamp: "2024-06-01T00:00:00Z",
   },
 ];
 

@@ -44,17 +44,20 @@ const SHOWCASE_ITEMS = [
   { lens: 'Science', color: '#10B981', title: 'CRISPR Gene Therapy', detail: 'First gene-editing cure approved 2023. Sickle cell disease.', slug: 'science' },
 ];
 
-const LIVE_FEED = [
-  { text: 'New deep-sea species discovered at 7,200m in Tonga Trench', lens: 'Deep Ocean' },
-  { text: 'CIA releases 2,800 documents from 1960s Latin America operations', lens: 'Declassified' },
-  { text: 'AI identifies potential suspect in 1986 cold case using genetic genealogy', lens: 'Cold Cases' },
-  { text: 'mRNA cancer vaccine enters Phase 3 clinical trials — Moderna', lens: 'Science' },
-  { text: 'Satellite imagery reveals possible buried structure near Nazca Lines', lens: 'Buried' },
-  { text: 'NSF funds $40M ocean floor mapping initiative in South Pacific', lens: 'Deep Ocean' },
-  { text: 'Zodiac Killer DNA re-analyzed with 2026 sequencing technology', lens: 'Cold Cases' },
-  { text: 'GLP-1 drugs show neuroprotective effects in Alzheimer\'s Phase 2 trial', lens: 'Science' },
-  { text: 'FOIA request reveals unreported Pentagon UAP investigation program', lens: 'Declassified' },
-  { text: 'Underwater lidar maps New Bronze Age settlement off Greek coast', lens: 'Buried' },
+// HONESTY RULE: this ticker was once a fake "live feed" — on a platform
+// named TRUTH, that's disqualifying. Every line below is a real, verifiable,
+// dated fact. It's now framed as "from the files," not live news.
+const FROM_THE_FILES = [
+  { text: '1971 — D.B. Cooper parachuted from Flight 305 with $200,000. Never identified.', lens: 'Cold Cases' },
+  { text: '1985 — the Titanic wreck was found at ~3,800m, 73 years after she sank', lens: 'Deep Ocean' },
+  { text: 'Göbekli Tepe is ~11,500 years old — and most of it is still unexcavated', lens: 'Buried' },
+  { text: '1977 — ~20,000 pages of MKUltra records surfaced via FOIA, after most were destroyed in 1973', lens: 'Declassified' },
+  { text: '2023 — Casgevy became the first approved CRISPR gene-editing therapy (sickle cell)', lens: 'Science' },
+  { text: 'Only about a quarter of the ocean floor has been mapped in high resolution', lens: 'Deep Ocean' },
+  { text: '2018 — the Golden State Killer was identified through public genetic genealogy', lens: 'Cold Cases' },
+  { text: 'The Voynich Manuscript remains undeciphered after six centuries', lens: 'Public Knowledge' },
+  { text: "1901 — sponge divers pulled a 2,000-year-old analog computer from a shipwreck (the Antikythera Mechanism)", lens: 'Buried' },
+  { text: "The Zodiac Killer's Z340 cipher took 51 years to crack (solved 2020). Z13 and Z32 remain unsolved.", lens: 'Cold Cases' },
 ];
 
 const TYPEWRITER_PHRASES = [
@@ -413,10 +416,10 @@ export default function HomePage() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-4 shrink-0">
             <Zap className="w-3.5 h-3.5 text-truth-blue" />
-            <span className="text-xs font-mono font-semibold text-truth-blue uppercase tracking-wider">Live</span>
+            <span className="text-xs font-mono font-semibold text-truth-blue uppercase tracking-wider">From the files</span>
           </div>
           <div ref={feedRef} className="flex gap-12 animate-[tickerScroll_60s_linear_infinite]">
-            {[...LIVE_FEED, ...LIVE_FEED].map((item, i) => (
+            {[...FROM_THE_FILES, ...FROM_THE_FILES].map((item, i) => (
               <span key={i} className="text-sm text-text-secondary whitespace-nowrap flex items-center gap-2">
                 <TrendingUp className="w-3 h-3 text-text-muted shrink-0" />
                 <span className="text-text-muted">[{item.lens}]</span>

@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { guardRequest, capText } from '@/lib/api-guard';
 
 export async function POST(req: NextRequest) {
+  // translations are cheaper but chatty — 30/min per IP, generous daily fuse
+  const blocked = guardRequest(req, { limit: 30, windowMs: 60_000, dailyCap: 5000 });
+  if (blocked) return blocked;
+
   try {
-    const { text, targetLanguage } = await req.json();
+    const raw = await req.json();
+    const text = capText(raw.text, 2000);
+    const targetLanguage = capText(raw.targetLanguage, 10);
 
     if (!text || !targetLanguage) {
       return NextResponse.json({ error: 'Missing text or targetLanguage' }, { status: 400 });
@@ -22,7 +29,7 @@ export async function POST(req: NextRequest) {
     const openai = new OpenAI({ apiKey });
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini', // translation quality holds; ~15x cheaper than gpt-4o
       temperature: 0.2,
       messages: [
         {

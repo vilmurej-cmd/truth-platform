@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { guardRequest, capText } from '@/lib/api-guard';
 
 const SYSTEM_PROMPT = `You are TRUTH's Declassified Document Analyzer. Analyze declassified government documents, programs, and operations. Identify patterns, connections, and implications. Only reference real, verified declassified information. Return JSON with: analysis (title, agency, period, summary, confidenceLevel, classification), documents[] (name, agency, yearClassified, yearDeclassified, significance), findings[] (finding, evidence, implication), connections[] (program, connection, verified), timeline[] (date, event, significance). Return ONLY valid JSON, no markdown.`;
 
@@ -8,7 +9,7 @@ const DEMO_RESPONSE = {
     title: 'Declassified Program Analysis',
     agency: 'Multiple U.S. Government Agencies',
     period: '1950s-1970s',
-    summary: 'Analysis of declassified documents reveals a pattern of interconnected intelligence programs that were significantly broader in scope than initially disclosed. Freedom of Information Act releases and mandatory declassification reviews have progressively revealed the full extent of these operations.',
+    summary: 'Example analysis (demo mode — live AI engine not connected). Analysis of declassified documents reveals a pattern of interconnected intelligence programs that were significantly broader in scope than initially disclosed. Freedom of Information Act releases and mandatory declassification reviews have progressively revealed the full extent of these operations.',
     confidenceLevel: 'verified',
     classification: 'Formerly classified, now publicly available through FOIA and mandatory declassification review'
   },
@@ -61,9 +62,17 @@ const DEMO_RESPONSE = {
 };
 
 export async function POST(req: NextRequest) {
+  // AI analysis is expensive (GPT-4o) — tight limits: 5/min, 20/hour per IP
+  const blocked =
+    guardRequest(req, { limit: 5, windowMs: 60_000 }) ??
+    guardRequest(req, { limit: 20, windowMs: 3_600_000, dailyCap: 1000 });
+  if (blocked) return blocked;
+
   try {
     const body = await req.json();
-    const { topic, agency, yearRange } = body;
+    const topic = capText(body.topic, 500);
+    const agency = capText(body.agency, 100);
+    const yearRange = capText(body.yearRange, 60);
 
     if (!topic) {
       return NextResponse.json({ error: 'topic is required' }, { status: 400 });

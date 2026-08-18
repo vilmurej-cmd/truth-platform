@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { guardRequest, capText } from '@/lib/api-guard';
 
 const SYSTEM_PROMPT = `You are TRUTH's Archaeological Analyzer. Analyze archaeological sites, artifacts, and historical mysteries. Cross-reference findings across civilizations and time periods. Return JSON with: analysis (title, location, period, summary, confidenceLevel, significance), findings[] (item, description, dating, significance), connections[] (civilization, connection, evidence), theories[] (theory, support, challenges), timeline[] (date, event). Return ONLY valid JSON, no markdown.`;
 
@@ -8,7 +9,7 @@ const DEMO_RESPONSE = {
     title: 'Archaeological Site Analysis',
     location: 'Eastern Mediterranean Region',
     period: 'Late Bronze Age (1200-1150 BCE)',
-    summary: 'Analysis reveals a multi-layered settlement site with evidence of continuous habitation spanning several centuries. Artifact assemblages indicate extensive trade networks connecting this site to major Bronze Age civilizations. Destruction layers correspond with the broader Late Bronze Age collapse.',
+    summary: 'Example analysis (demo mode — live AI engine not connected). Analysis reveals a multi-layered settlement site with evidence of continuous habitation spanning several centuries. Artifact assemblages indicate extensive trade networks connecting this site to major Bronze Age civilizations. Destruction layers correspond with the broader Late Bronze Age collapse.',
     confidenceLevel: 'high',
     significance: 'Provides critical evidence for understanding trade routes and cultural exchange during the Late Bronze Age, as well as the systemic collapse that ended this era.'
   },
@@ -66,9 +67,17 @@ const DEMO_RESPONSE = {
 };
 
 export async function POST(req: NextRequest) {
+  // AI analysis is expensive (GPT-4o) — tight limits: 5/min, 20/hour per IP
+  const blocked =
+    guardRequest(req, { limit: 5, windowMs: 60_000 }) ??
+    guardRequest(req, { limit: 20, windowMs: 3_600_000, dailyCap: 1000 });
+  if (blocked) return blocked;
+
   try {
     const body = await req.json();
-    const { site, period, findings } = body;
+    const site = capText(body.site, 500);
+    const period = capText(body.period, 200);
+    const findings = (Array.isArray(body.findings) ? body.findings : []).slice(0, 10).map((f: unknown) => capText(f, 400)).filter(Boolean);
 
     if (!site) {
       return NextResponse.json({ error: 'site is required' }, { status: 400 });

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { guardRequest, capText } from '@/lib/api-guard';
 
 const SYSTEM_PROMPT = `You are TRUTH's Cold Case Analyzer. Analyze cold cases using modern investigative techniques, cross-reference with known cases, and identify potential connections. Return JSON with: analysis (summary, confidenceLevel, methodology), evidence[] (item, significance, status), suspects[] (profile, likelihood), connections[] (relatedCase, connection, strength), breakthroughs[] (finding, implication), timeline[] (date, event). Return ONLY valid JSON, no markdown.`;
 
@@ -7,7 +8,7 @@ const DEMO_RESPONSE = {
   analysis: {
     summary: 'Analysis of the case reveals several overlooked evidentiary threads that modern forensic techniques could now address. DNA re-analysis and digital forensic methods offer the highest probability of generating new leads.',
     confidenceLevel: 'moderate',
-    methodology: 'Multi-vector analysis combining forensic re-evaluation, behavioral profiling, geographic pattern analysis, and cross-case database matching.'
+    methodology: 'Example analysis (demo mode — live AI engine not connected). Multi-vector analysis combining forensic re-evaluation, behavioral profiling, geographic pattern analysis, and cross-case database matching.'
   },
   evidence: [
     {
@@ -61,9 +62,16 @@ const DEMO_RESPONSE = {
 };
 
 export async function POST(req: NextRequest) {
+  // AI analysis is expensive (GPT-4o) — tight limits: 5/min, 20/hour per IP
+  const blocked =
+    guardRequest(req, { limit: 5, windowMs: 60_000 }) ??
+    guardRequest(req, { limit: 20, windowMs: 3_600_000, dailyCap: 1000 });
+  if (blocked) return blocked;
+
   try {
     const body = await req.json();
-    const { caseDescription, evidence } = body;
+    const caseDescription = capText(body.caseDescription, 2000);
+    const evidence = (Array.isArray(body.evidence) ? body.evidence : []).slice(0, 10).map((e: unknown) => capText(e, 400)).filter(Boolean);
 
     if (!caseDescription) {
       return NextResponse.json({ error: 'caseDescription is required' }, { status: 400 });

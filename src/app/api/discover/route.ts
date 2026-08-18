@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { guardRequest, capText } from '@/lib/api-guard';
 
 const SYSTEM_PROMPT = `You are TRUTH, the world's first universal discovery engine. Analyze the query and return discoveries with cross-referenced sources.
 
@@ -16,9 +17,9 @@ const DEMO_RESPONSE = {
       title: 'Pattern Recognition in Historical Data',
       summary: 'Cross-referencing multiple databases reveals recurring patterns that connect seemingly unrelated events across different time periods and geographic regions. Analysis of declassified archives alongside academic publications shows statistically significant correlations in timing and geographic clustering of events previously considered independent. These patterns suggest coordinated or systemic forces at work beneath surface-level historical narratives.',
       sources: [
-        { name: 'National Archives — Declassified Records', type: 'government' },
-        { name: 'Journal of Historical Analysis, Vol. 42', type: 'academic' },
-        { name: 'Public Records Aggregation Database', type: 'database' }
+        { name: 'Example source — government archive (demo)', type: 'government' },
+        { name: 'Example source — academic journal (demo)', type: 'academic' },
+        { name: 'Example source — public records database (demo)', type: 'database' }
       ],
       confidenceLevel: 'high',
       connections: ['Historical Pattern Analysis', 'Data Cross-Referencing', 'Temporal clustering of geopolitical events'],
@@ -28,9 +29,9 @@ const DEMO_RESPONSE = {
       title: 'Emerging Connections in Open-Source Intelligence',
       summary: 'Open-source intelligence analysis reveals previously overlooked connections between public records, scientific publications, and declassified materials. Natural language processing of 1.4 million public documents identifies recurring entity relationships that traditional keyword searches miss entirely. The methodology combines named-entity recognition with graph-based relationship mapping to surface hidden networks of influence and information flow.',
       sources: [
-        { name: 'OSINT Framework Aggregated Databases', type: 'database' },
-        { name: 'Published Research Corpus (2020-2026)', type: 'academic' },
-        { name: 'Government Transparency Portal', type: 'government' }
+        { name: 'Example source — open-source intelligence database (demo)', type: 'database' },
+        { name: 'Example source — published research corpus (demo)', type: 'academic' },
+        { name: 'Example source — transparency portal (demo)', type: 'government' }
       ],
       confidenceLevel: 'moderate',
       connections: ['Open Source Intelligence', 'Public Records Analysis', 'NLP-driven entity extraction'],
@@ -46,13 +47,20 @@ const DEMO_RESPONSE = {
       strength: 78
     }
   ],
-  methodology: 'Multi-source cross-referencing with confidence weighting based on source reliability and corroboration density.'
+  methodology: 'Example analysis (demo mode — live AI engine not connected). Multi-source cross-referencing with confidence weighting based on source reliability and corroboration density.'
 };
 
 export async function POST(req: NextRequest) {
+  // AI analysis is expensive (GPT-4o) — tight limits: 5/min, 20/hour per IP
+  const blocked =
+    guardRequest(req, { limit: 5, windowMs: 60_000 }) ??
+    guardRequest(req, { limit: 20, windowMs: 3_600_000, dailyCap: 1000 });
+  if (blocked) return blocked;
+
   try {
     const body = await req.json();
-    const { query, category } = body;
+    const query = capText(body.query, 500);
+    const category = capText(body.category, 60);
 
     if (!query) {
       return NextResponse.json({ error: 'query is required' }, { status: 400 });
